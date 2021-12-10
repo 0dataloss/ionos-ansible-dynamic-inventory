@@ -32,7 +32,7 @@ from getpass import getpass
 ## You can configure username and password here
 ###############################################
 #username=""
-#password""
+#password=""
 ###############################################
 # Read Env Variables 
 if os.getenv('IONOS_USERNAME'):
@@ -58,7 +58,7 @@ if len(sys.argv) > 2:
       whatToPrint = "LIST"
 '''
 
-# If there are no Env Vars or no values from this file I am requesting User Inputs
+# If there are no Env Vars or no file configuration I am requesting User Inputs
 if isinstance(username,str):
   user_input_username = username
 else:
