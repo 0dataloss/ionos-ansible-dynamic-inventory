@@ -1,4 +1,9 @@
-# Dynamic Inventory
+# IONOS Dynamic Inventory
+
+This is a personal attempt to create a decent Dynamic Inventory for IONOS Public CLoud
+So far the features of this script are pretty limited to the basics:
+- Groups made by hosts in the same Virtual Data Center, grouped by the Virtual Data Center's Name
+- Groups made by single host, grouped by the server's Name
 
 ## Table of Contents
 
