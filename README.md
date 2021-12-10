@@ -29,8 +29,8 @@ Is possible to specify username and password inside the file itself (recommended
 ###############################################
 ## You can configure username and password here
 ###############################################
-#username=""
-#password""
+username=0
+password0
 ###############################################
 ```
 or
