@@ -23,11 +23,12 @@ import base64
 import os
 from getpass import getpass
 
-###############################################
-## You can configure username and password here
-###############################################
-username=""
-password=""
+#################################################
+## You can configure username and password here##
+#################################################
+# Do not comment out username and password lines (I know... I know...)
+username=0
+password=0
 ###############################################
 # Read Env Variables 
 if os.getenv('IONOS_USERNAME'):
