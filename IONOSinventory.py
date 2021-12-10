@@ -118,16 +118,12 @@ def listServers1DC(authHead,dcid,dcpvlan):
       srvName=server['properties']['name']
       serverDict['name']=srvName
       nics=server['entities']['nics']['items']
-      if str(dcpvlan) == "000":
-        print("I am here!!!!")
-        serverDict['ip']="No Public Connection"
-      else:
-        for nic in nics:
-          lan=str(nic['properties']['lan'])
-          if lan == dcpvlan:
-              srvIp=nic['properties']['ips'][0]
-              serverDict['ip']=srvIp
-      serverList.append(serverDict)
+      for nic in nics:
+        lan=str(nic['properties']['lan'])
+        if lan == dcpvlan:
+            srvIp=nic['properties']['ips'][0]
+            serverDict['ip']=srvIp
+  serverList.append(serverDict)
   return serverList
 
 
@@ -161,7 +157,6 @@ if whatToPrint == "LIST":
           allprint[srvname] = {"hosts": srvrPip , 'vars': {}}
         hostvar["hostvars"]=hostvarDict
         allprint[dcName] = {"hosts": srvrList , 'vars': {}}
-        #print(allprint)
     allprint["_meta"] = hostvar
     allprint = json.dumps(allprint)
     print(allprint)
