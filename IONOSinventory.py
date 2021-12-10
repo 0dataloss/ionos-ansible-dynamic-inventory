@@ -17,22 +17,17 @@
 
 ######################################################################
 
-
-import socket
-import sys
 import requests
 import json
-import datetime
 import base64
 import os
-from pprint import pprint
 from getpass import getpass
 
 ###############################################
 ## You can configure username and password here
 ###############################################
-#username=""
-#password=""
+username=""
+password=""
 ###############################################
 # Read Env Variables 
 if os.getenv('IONOS_USERNAME'):
@@ -105,66 +100,10 @@ def findDatacentersPublicVlan(authHead,dc):
       isPublic=lan['properties']['public']
       if isPublic is True:
           return lanId
-
-#def findDatacentersDeep(authHead,hostNamed):
-#  url = apiEp +"/datacenters?depth=5"
-#  response = requests.get(url, headers=authHead)
-#  datacentersRp = (response.json())
-#  datacentersList = []
-#  for item in datacentersRp['items']:
-#    for lan in item['entities']['lans']['items']:
-#        ciccio=lan['id']
-#    for server in item['entities']['servers']['items']:
-#      serverID = server['id']
-#      hostNamedRp = server['properties']['name']
-#      if hostNamedRp == hostNamed:
-#        nicList=[]
-#        counterNic=0
-#        for nic in server['entities']['nics']['items']:
-#            nicdict={}
-#            id=nic['id']
-#            nicName="eth" + str(counterNic)
-#            nicdict["interface"]=nicName
-#            macca=nic['properties']['mac']
-#            nicdict["hardware_address"]=macca
-#            netmasK="255.255.255.0"
-#            nicdict["netmask"]=netmasK
-#            Ip=nic['properties']['ips'][0]
-#            nicdict["ip"]=Ip
-#            nicList.append(nicdict)
-#            counterNic=counterNic+1
-#        # Create DictResponse
-#        DictResponse = {}
-#        DictResponse['network'] = nicList
-#        return DictResponse
+# Placeholder for DC with no public VLANS
 #      else:
-#        continue
-
-# Discontinued as I am not using --host anymore
-#def findDatacentersDeep2(authHead,dcid,dcpvlan,hostReq):
-#  url = apiEp +"/datacenters/" + dcid +"/servers?depth=3"
-#  response = requests.get(url, headers=authHead)
-#  serverRp = (response.json())
-#  serverList=[]
-#  for server in serverRp['items']:
-#      serverDict = {}
-#      srvId=server['id']
-#      serverDict['srvid']=srvId
-#      srvName=server['properties']['name']
-#      if srvName != hostReq:
-#        HNF="NotFound"
-#        return  HNF
-#        continue
-#      else:
-#        serverDict['name']=srvName
-#        nics=server['entities']['nics']['items']
-#        for nic in nics:
-#            lan=str(nic['properties']['lan'])
-#            if lan == dcpvlan:
-#                srvIp=nic['properties']['ips'][0]
-#                serverDict['ip']=srvIp
-#        serverList.append(serverDict)
-#      return serverList
+#          lanNotPublic=True
+#          return lanNotPublic
 
 def listServers1DC(authHead,dcid,dcpvlan):
   url = apiEp +"/datacenters/" + dcid +"/servers?depth=3"
@@ -178,7 +117,11 @@ def listServers1DC(authHead,dcid,dcpvlan):
       srvName=server['properties']['name']
       serverDict['name']=srvName
       nics=server['entities']['nics']['items']
-      for nic in nics:
+      if str(dcpvlan) == "000":
+        print("I am here!!!!")
+        serverDict['ip']="No Public Connection"
+      else:
+        for nic in nics:
           lan=str(nic['properties']['lan'])
           if lan == dcpvlan:
               srvIp=nic['properties']['ips'][0]
@@ -205,7 +148,8 @@ if whatToPrint == "LIST":
         for srvr in serversDcList:
           srvrPip=[]
           srvrVars={}
-          ip=srvr['ip']
+          # If Instance does not have Public IP returns NULL
+          ip=srvr.get('ip')
           srvrList.append(ip)
           srvrPip.append(ip)
           srvname=srvr['name']
@@ -220,37 +164,3 @@ if whatToPrint == "LIST":
     allprint["_meta"] = hostvar
     allprint = json.dumps(allprint)
     print(allprint)
-
-#if whatToPrint == "HOST":
-#      # Init Dicts
-#    hostvarDict={}
-#    hostvar={}
-#    allprint={}
-#    # Create DCs UUID list
-#    dcs=findDatacenters(authAcc)
-#    # Iterate inside DCs to find hosts 
-#    for dc in dcs:
-#        dcId=dc
-#        dcName=findDatacentersName(authAcc,dc)
-#        dcPvlan=findDatacentersPublicVlan(authAcc,dc)
-##        serversDcList=listServers1DC(authAcc,dc,dcPvlan)
-#        serversDcList=findDatacentersDeep2(authAcc,dc,dcPvlan,hostReq)
-#        if serversDcList == "NotFound":
-#              continue
-#        srvrList=[]
-#        srvrVars={}
-#    # Build Dictionary of hostnames
-#        for srvr in serversDcList:
-#            ip=srvr['ip']
-#            srvrList.append(ip)
-#            srvname=srvr['name']
-#            srvrVars["name"]=srvname
-#            srvrid=srvr['srvid']
-#            srvrVars["id"]=srvrid
-#            hostvarDict[ip] = srvrVars
-#        hostvar["hostvars"]=hostvarDict
-#        allprint[srvname] = {"hosts": srvrList , 'vars': {}}
-#        #print(allprint)
-#    allprint["_meta"] = hostvar
-#    allprint = json.dumps(allprint)
-#    print(allprint)
