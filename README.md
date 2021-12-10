@@ -5,7 +5,7 @@
 - [Description](#description)
 - [Installation](#installation)
 - [Usage](#usage)
-- [Test your setup](#testyoursetup)
+- [Test your setup](#test-your-setup)
 
 ## Description
 
