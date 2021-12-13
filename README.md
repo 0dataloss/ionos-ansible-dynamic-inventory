@@ -1,6 +1,6 @@
 # IONOS Dynamic Inventory
 
-This is a personal attempt to create a decent Dynamic Inventory for IONOS Public CLoud
+This is a personal attempt to create a decent Dynamic Inventory for IONOS Public Cloud
 So far the features of this script are pretty limited to the basics:
 - Groups made by hosts in the same Virtual Data Center, grouped by the Virtual Data Center's Name
 - Groups made by single host, grouped by the server's Name
@@ -19,7 +19,7 @@ IONOSinventory.py is an Ansible dynamic inventory, able to generate JSON output 
 ## Installation
 
 No special install procedure is required. 
-The script can be used standalone or with Ansible
+The script can be used stand-alone or with Ansible
 The IONOSinventory.py has been tested with Python 3.8
 
 ## Configuration
@@ -39,9 +39,9 @@ password0
 ###############################################
 ```
 or
-If none of the two options above have been set-up, the script will request user iniput username and password.
+If none of the two options above have been set-up, the script will request user input username and password.
 
-It is also possible to change the api end-point URL; there is no need right now as the script has been design for the latest version of the API end-point (v6.0), and this functionality is reserved for future use.
+It is also possible to change the API end-point URL; there is no need right now as the script has been design for the latest version of the API end-point (v6.0), and this functionality is reserved for future use.
 ```
 apiEp="https://api.ionos.com/cloudapi/v6"
 ```
@@ -54,7 +54,7 @@ In this mode, the IONOSinventory.py will expose servers grouped by Virtual Data 
 At this moment there is an issue with the 'grouped by name' as if there are multiple machines with the same name across multiple Virtual Data Center they will all be used as 'host' by Ansible.
 
 ## Test your setup
-Is it possible to run the script standalone against the IONOS API to verify if the username and password used
+Is it possible to run the script stand-alone against the IONOS API to verify if the username and password used
 are working as expected in terms of accessing resources
 
 ```
