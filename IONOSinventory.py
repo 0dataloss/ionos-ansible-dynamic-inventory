@@ -55,6 +55,7 @@ if len(sys.argv) > 2:
 '''
 
 # If there are no Env Vars or no file configuration I am requesting User Inputs
+# IT DOES NOT WORK IF YOU CALL THE INVENTORY WITH 'ansible -i IONOSinventory.py'
 if isinstance(username,str):
   user_input_username = username
 else:
