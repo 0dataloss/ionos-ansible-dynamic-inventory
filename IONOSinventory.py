@@ -97,11 +97,15 @@ def findDatacentersPublicVlan(authHead,dc):
   response = requests.get(url, headers=authHead)
   datacentersRp = (response.json())
   lans = datacentersRp['entities']['lans']['items']
+  publicLanList=[]
   for lan in lans:
-      lanId=lan['id']
-      isPublic=lan['properties']['public']
+    lanId=lan['id']
+    lanName=lan['properties']['name']
+    isPublic=lan['properties']['public']
+    if lanName != "k8s-public-lan":
       if isPublic is True:
-          return lanId
+        publicLanList.append(lanId)
+  return publicLanList
 # Placeholder for DC with no public VLANS
 #      else:
 #          lanNotPublic=True
@@ -121,10 +125,11 @@ def listServers1DC(authHead,dcid,dcpvlan):
       nics=server['entities']['nics']['items']
       for nic in nics:
         lan=str(nic['properties']['lan'])
-        if lan == dcpvlan:
+        for i in dcpvlan:
+           if lan == i:
             srvIp=nic['properties']['ips'][0]
             serverDict['ip']=srvIp
-  serverList.append(serverDict)
+            serverList.append(serverDict)
   return serverList
 
 
