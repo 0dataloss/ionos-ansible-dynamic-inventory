@@ -240,7 +240,7 @@ elif whatToPrint == "DC" :
     hostvarDict[ip] = srvrVars
     allprint[srvname] = {"hosts": srvrPip , 'vars': {}}
   hostvar["hostvars"]=hostvarDict
-  allprint[dcUuid] = {"hosts": srvrList , 'vars': {}}
+  allprint["VDC"] = {"hosts": srvrList , 'vars': {}}
   allprint["_meta"] = hostvar
   allprint = json.dumps(allprint)
   print(allprint)
