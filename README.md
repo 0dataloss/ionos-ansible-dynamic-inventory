@@ -1,9 +1,12 @@
 # IONOS Dynamic Inventory
 
 This is a personal attempt to create a decent Dynamic Inventory for IONOS Public Cloud
-So far the features of this script are pretty limited to the basics:
-- Groups made by hosts in the same Virtual Data Center, grouped by the Virtual Data Center's Name
-- Groups made by single host, grouped by the server's Name
+The features so far:
+- With --list will show groups made by hosts in the same Virtual Data Center, grouped by the Virtual Data Center's Name
+- With --list will show groups made by single host, grouped by the server's Name
+- With --dc DC_UUID will show all servers RUNNINNG connected to a Public Network in a specific VDC 
+- With --off will show a list of all the servers in SHUTDOWN state connected to a public network (NOT FOR INVENTORY PURPOSES)
+- With --off --dc DC_UUID will shows all the servers in SHUTDOWN state connected to a public network for a specific VDC
 
 ## Table of Contents
 
