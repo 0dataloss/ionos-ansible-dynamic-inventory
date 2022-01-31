@@ -27,17 +27,17 @@ from getpass import getpass
 #################################################
 ## You can configure username and password here##
 #################################################
-#username=""
-#password=""
+#username = ""
+#password = ""
 #################################################
 try:
   username
 except:
-  username=None
+  username = None
 try:
   password
 except:
-  password=None
+  password = None
 
 ###############################################
 # Read Env Variables 
@@ -47,8 +47,8 @@ if os.getenv('IONOS_PASSWORD'):
     password = os.getenv('IONOS_PASSWORD')
 
 # Initial vars if there are no arguments
-whatToPrint="LIST"
-apiEp="https://api.ionos.com/cloudapi/v6"
+whatToPrint = "LIST"
+apiEp = "https://api.ionos.com/cloudapi/v6"
 
 # Manage selector but it can be done better than this, I am sure
 if len(sys.argv) == 2:
@@ -78,7 +78,7 @@ if len(sys.argv) == 2:
     sys.exit(1)
 elif len(sys.argv) == 3 :
   if sys.argv[1] == "--dc":
-    dcUuid=sys.argv[2]
+    dcUuid = sys.argv[2]
     try:
       dcUuid
       whatToPrint = "DC"
@@ -87,7 +87,7 @@ elif len(sys.argv) == 3 :
       sys.exit(1)
 elif len(sys.argv) == 4 :
   if sys.argv[1] == "--dc":
-    dcUuid=sys.argv[2]
+    dcUuid = sys.argv[2]
     try:
       dcUuid
     except:
@@ -97,32 +97,33 @@ elif len(sys.argv) == 4 :
       whatToPrint = "OFFDC"
   elif sys.argv[1] == "--off":
     if sys.argv[2] == "--dc":
-      dcUuid=sys.argv[3]
+      dcUuid = sys.argv[3]
     try:
       dcUuid
       whatToPrint = "OFFDC"
     except:
       print(f"with the flag --dc you have to specify a VDC UUID")
       sys.exit(1)
-
+##################################################################################
 # If there are no Env Vars or no file configuration I am requesting User Inputs
 # IT DOES NOT WORK IF YOU CALL THE INVENTORY WITH 'ansible -i IONOSinventory.py'
+##################################################################################
 if isinstance(username,str):
   user_input_username = username
 else:
   user_input_username = input("Please insert username\n")
 if isinstance(password,str):
-  user_input_password=password
+  user_input_password = password
 else:
-  user_input_password=getpass()
+  user_input_password = getpass()
 # End User Input
 
 # Prepare base64 username:password Header
-user_input_usernameandpassword=str(user_input_username+":"+user_input_password)
+user_input_usernameandpassword = str(user_input_username+":"+user_input_password)
 message_bytes = user_input_usernameandpassword.encode('ascii')
 base64_bytes = base64.b64encode(message_bytes)
 token = base64_bytes.decode('ascii')
-authAcc={"Authorization": "Basic "+token+""}
+authAcc = {"Authorization": "Basic "+token+""}
 
 # Build a List of product which have been used per DC
 def findDatacenters(authHead):
@@ -148,11 +149,11 @@ def findDatacentersPublicVlan(authHead,dc):
   response = requests.get(url, headers=authHead)
   datacentersRp = (response.json())
   lans = datacentersRp['entities']['lans']['items']
-  publicLanList=[]
+  publicLanList = []
   for lan in lans:
-    lanId=lan['id']
-    lanName=lan['properties']['name']
-    isPublic=lan['properties']['public']
+    lanId = lan['id']
+    lanName = lan['properties']['name']
+    isPublic = lan['properties']['public']
     # Filter K8S node servers because is a PaaS not a IaaS
     if lanName != "k8s-public-lan":
       if isPublic is True:
@@ -160,73 +161,71 @@ def findDatacentersPublicVlan(authHead,dc):
   return publicLanList
 #########################################
 # Placeholder for DC with no public VLANS
+# Or specific vlanID
 #########################################
-#      else:
-#          lanNotPublic=True
-#          return lanNotPublic
 
 def listServers1DC(authHead,dcid,dcpvlan,reqstatus):
   url = apiEp +"/datacenters/" + dcid +"/servers?depth=3"
   response = requests.get(url, headers=authHead)
   serverRp = (response.json())
-  serverList=[]
+  serverList = []
   for server in serverRp['items']:
       serverDict = {}
-      srvId=server['id']
-      serverDict['srvid']=srvId
-      srvName=server['properties']['name']
-      srvStatus=server['properties']['vmState']
-      serverDict['name']=srvName
-      nics=server['entities']['nics']['items']
+      srvId = server['id']
+      serverDict['srvid'] = srvId
+      srvName = server['properties']['name']
+      srvStatus = server['properties']['vmState']
+      serverDict['name'] = srvName
+      nics = server['entities']['nics']['items']
       for nic in nics:
-        lan=str(nic['properties']['lan'])
+        lan = str(nic['properties']['lan'])
         for i in dcpvlan:
           if lan == i:
             if srvStatus == reqstatus:
               if reqstatus == "RUNNING":
-                srvIp=nic['properties']['ips'][0]
-                serverDict['ip']=srvIp
+                srvIp = nic['properties']['ips'][0]
+                serverDict['ip'] = srvIp
                 serverList.append(serverDict)
               else:
-                serverDict['ip']="No IP Assigned"
+                serverDict['ip'] = "No IP Assigned"
                 serverList.append(serverDict)
   return serverList
 
 def printlist(authAcc,reqstatus):
   # Init Dicts
-  hostvarDict={}
-  hostvar={}
-  allprint={}
+  hostvarDict = {}
+  hostvar = {}
+  allprint = {}
   # Create DCs UUID list
-  dcs=findDatacenters(authAcc)
+  dcs = findDatacenters(authAcc)
   # Iterate inside DCs to find all the hosts 
   if reqstatus == "DCLIST":
     for dc in dcs:
-      dcName=findDatacentersName(authAcc,dc)
-      allprint[dc]=dcName
+      dcName = findDatacentersName(authAcc,dc)
+      allprint[dc] = dcName
     return allprint
   for dc in dcs:
-      c0=0
-      dcName=findDatacentersName(authAcc,dc)
-      dcPvlan=findDatacentersPublicVlan(authAcc,dc)
-      serversDcList=listServers1DC(authAcc,dc,dcPvlan,reqstatus)
-      srvrList=[]
+      c0 = 0
+      dcName = findDatacentersName(authAcc,dc)
+      dcPvlan = findDatacentersPublicVlan(authAcc,dc)
+      serversDcList = listServers1DC(authAcc,dc,dcPvlan,reqstatus)
+      srvrList = []
       # Build Dictionary of hostnames and DataCenters
       for srvr in serversDcList:
-        srvrPip=[]
-        srvrVars={}
+        srvrPip = []
+        srvrVars = {}
         # If Instance does not have Public IP returns NULL
-        ip=srvr.get('ip')
+        ip = srvr.get('ip')
         srvrList.append(ip)
         srvrPip.append(ip)
-        srvname=srvr['name']
-        srvrVars["name"]=srvname
-        srvrid=srvr['srvid']
-        srvrVars["id"]=srvrid
+        srvname = srvr['name']
+        srvrVars["name"] = srvname
+        srvrid = srvr['srvid']
+        srvrVars["id"] = srvrid
         hostvarDict[c0] = srvrVars
         allprint[srvname] = {"hosts": srvrPip , 'vars': {}}
-        c0=(c0+1)
-      hostvar["hostvars"]=hostvarDict
+        c0 = (c0+1)
+      hostvar["hostvars"] = hostvarDict
       allprint[dcName] = {"hosts": srvrList , 'vars': {}}
   allprint["_meta"] = hostvar
   allprint = json.dumps(allprint)
@@ -235,73 +234,75 @@ def printlist(authAcc,reqstatus):
 # MAIN
 # Print Servers RUNNING with public interface for all VDC
 if whatToPrint == "LIST":
-  allprint=printlist(authAcc,"RUNNING")
+  allprint = printlist(authAcc,"RUNNING")
+  # Print Servers SHUTOFF with public interface for all VDC
   print(allprint)
-# Print Servers SHUTOFF with public interface for all VDC
+
 elif whatToPrint == "SHUTOFF":
-  allprint=printlist(authAcc,"SHUTOFF")
+  allprint = printlist(authAcc,"SHUTOFF")
+  # Print Servers RUNNING with public interface for 1 VDC 
   print(allprint)
-# Print Servers RUNNING with public interface for 1 VDC 
+
 elif whatToPrint == "DCLIST":
-  allprint=printlist(authAcc,"DCLIST")
+  allprint = printlist(authAcc,"DCLIST")
+  # Print DC UUID and Name
   print(allprint)
+
 elif whatToPrint == "DC" :
-  reqstatus="RUNNING"
-  dcPvlan=findDatacentersPublicVlan(authAcc,dcUuid)
-  serversDcList=listServers1DC(authAcc,dcUuid,dcPvlan,reqstatus)
-  srvrList=[]
+  reqstatus = "RUNNING"
+  dcPvlan = findDatacentersPublicVlan(authAcc,dcUuid)
+  serversDcList = listServers1DC(authAcc,dcUuid,dcPvlan,reqstatus)
+  srvrList = []
   # Build Dictionary of hostnames and DataCenters
   # Init Dicts
-  hostvarDict={}
-  hostvar={}
-  allprint={}
+  hostvarDict = {}
+  hostvar = {}
+  allprint = {}
   for srvr in serversDcList:
-    srvrPip=[]
-    srvrVars={}
+    srvrPip = []
+    srvrVars = {}
     # If Instance does not have Public IP returns NULL
-    ip=srvr.get('ip')
+    ip = srvr.get('ip')
     srvrList.append(ip)
     srvrPip.append(ip)
-    srvname=srvr['name']
-    srvrVars["name"]=srvname
-    srvrid=srvr['srvid']
-    srvrVars["id"]=srvrid
+    srvname = srvr['name']
+    srvrVars["name"] = srvname
+    srvrid = srvr['srvid']
+    srvrVars["id"] = srvrid
     hostvarDict[ip] = srvrVars
     allprint[srvname] = {"hosts": srvrPip , 'vars': {}}
-  hostvar["hostvars"]=hostvarDict
+  hostvar["hostvars"] = hostvarDict
   allprint[dcUuid] = {"hosts": srvrList , 'vars': {}}
   allprint["_meta"] = hostvar
   allprint = json.dumps(allprint)
   print(allprint)
 # Print servers SHUTOFF with public interface for 1 single VDC
 elif whatToPrint == "OFFDC":
-  dcPvlan=findDatacentersPublicVlan(authAcc,dcUuid)
-  serversDcList=listServers1DC(authAcc,dcUuid,dcPvlan,"SHUTOFF")
-  srvrList=[]
+  dcPvlan = findDatacentersPublicVlan(authAcc,dcUuid)
+  serversDcList = listServers1DC(authAcc,dcUuid,dcPvlan,"SHUTOFF")
+  srvrList = []
   # Build Dictionary of hostnames and DataCenters
   # Init Dicts
-  hostvarDict={}
-  hostvar={}
-  allprint={}
-  c0=0
+  hostvarDict = {}
+  hostvar = {}
+  allprint = {}
+  c0 = 0
   for srvr in serversDcList:
-    srvrPip=[]
-    srvrVars={}
+    srvrPip = []
+    srvrVars = {}
     # If Instance does not have Public IP returns NULL
-    ip=srvr.get('ip')
+    ip = srvr.get('ip')
     srvrList.append(ip)
     srvrPip.append(ip)
-    srvname=srvr['name']
-    srvrVars["name"]=srvname
-    srvrid=srvr['srvid']
-    srvrVars["id"]=srvrid
+    srvname = srvr['name']
+    srvrVars["name"] = srvname
+    srvrid = srvr['srvid']
+    srvrVars["id"] = srvrid
     hostvarDict[c0] = srvrVars
     allprint[srvname] = {"hosts": srvrPip , 'vars': {}}
-    c0=(c0+1)
-  hostvar["hostvars"]=hostvarDict
+    c0 = (c0+1)
+  hostvar["hostvars"] = hostvarDict
   allprint[dcUuid] = {"hosts": srvrList , 'vars': {}}
   allprint["_meta"] = hostvar
   allprint = json.dumps(allprint)
   print(allprint)
-
-
