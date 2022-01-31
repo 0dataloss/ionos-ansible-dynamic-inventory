@@ -284,6 +284,7 @@ elif whatToPrint == "OFFDC":
   hostvarDict={}
   hostvar={}
   allprint={}
+  c0=0
   for srvr in serversDcList:
     srvrPip=[]
     srvrVars={}
@@ -295,8 +296,9 @@ elif whatToPrint == "OFFDC":
     srvrVars["name"]=srvname
     srvrid=srvr['srvid']
     srvrVars["id"]=srvrid
-    hostvarDict[ip] = srvrVars
+    hostvarDict[c0] = srvrVars
     allprint[srvname] = {"hosts": srvrPip , 'vars': {}}
+    c0=(c0+1)
   hostvar["hostvars"]=hostvarDict
   allprint[dcUuid] = {"hosts": srvrList , 'vars': {}}
   allprint["_meta"] = hostvar
