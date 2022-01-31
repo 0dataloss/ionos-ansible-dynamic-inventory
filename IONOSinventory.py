@@ -17,7 +17,6 @@
 
 ######################################################################
 
-from tkinter import N
 import requests
 import json
 import base64
