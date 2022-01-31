@@ -56,6 +56,9 @@ if len(sys.argv) == 2:
     whatToPrint = "LIST"
   elif sys.argv[1] == "--off":
     whatToPrint = "SHUTOFF"
+  else:
+    print(f"This option requires an argument")
+    sys.exit(1)
 elif len(sys.argv) == 3 :
   if sys.argv[1] == "--dc":
     dcUuid=sys.argv[2]
@@ -181,6 +184,7 @@ def printlist(authAcc,reqstatus):
   dcs=findDatacenters(authAcc)
   # Iterate inside DCs to find all the hosts 
   for dc in dcs:
+      c0=0
       dcId=dc
       dcName=findDatacentersName(authAcc,dc)
       dcPvlan=findDatacentersPublicVlan(authAcc,dc)
@@ -198,8 +202,9 @@ def printlist(authAcc,reqstatus):
         srvrVars["name"]=srvname
         srvrid=srvr['srvid']
         srvrVars["id"]=srvrid
-        hostvarDict[ip] = srvrVars
+        hostvarDict[c0] = srvrVars
         allprint[srvname] = {"hosts": srvrPip , 'vars': {}}
+        c0=(c0+1)
       hostvar["hostvars"]=hostvarDict
       allprint[dcName] = {"hosts": srvrList , 'vars': {}}
   allprint["_meta"] = hostvar
