@@ -1,9 +1,12 @@
 # IONOS Dynamic Inventory
 
 This is a personal attempt to create a decent Dynamic Inventory for IONOS Public Cloud
-So far the features of this script are pretty limited to the basics:
-- Groups made by hosts in the same Virtual Data Center, grouped by the Virtual Data Center's Name
-- Groups made by single host, grouped by the server's Name
+The features so far:
+- With --list will show groups made by hosts in the same Virtual Data Center, grouped by the Virtual Data Center's Name
+- With --list will show groups made by single host, grouped by the server's Name
+- With --dc DC_UUID will show all servers RUNNINNG connected to a Public Network in a specific VDC 
+- With --off will show a list of all the servers in SHUTDOWN state connected to a public network (NOT FOR INVENTORY PURPOSES)
+- With --off --dc DC_UUID will shows all the servers in SHUTDOWN state connected to a public network for a specific VDC
 
 ## Table of Contents
 
@@ -31,12 +34,12 @@ export IONOS_USERNAME="your@username.com" && export IONOS_PASSWORD="your passwor
 or
 Is possible to specify username and password inside the file itself (recommended ONLY for dev purposes)
 ```
-###############################################
-## You can configure username and password here
-###############################################
-username=0
-password=0
-###############################################
+#################################################
+## You can configure username and password here##
+#################################################
+#username=""
+#password=""
+#################################################
 ```
 or
 If none of the two options above have been set-up, the script will request user input username and password.
@@ -48,17 +51,18 @@ apiEp="https://api.ionos.com/cloudapi/v6"
 
 ## Usage
 
-IONOSinventory.py exposes bi default the `--list` functionality required by the Ansible inventory system; the `--list` switch is the only one implemented so far.
+IONOSinventory.py exposes by default the `--list` functionality required by the Ansible inventory system.
 
-In this mode, the IONOSinventory.py will expose servers grouped by Virtual Data Center and by Name.
-At this moment there is an issue with the 'grouped by name' as if there are multiple machines with the same name across multiple Virtual Data Center they will all be used as 'host' by Ansible.
+In this mode, the IONOSinventory.py will expose all the servers with state RUNNING with one connection to Public Network, grouped by Virtual Data Center and by Name.
+
+The script will also allow you to work on all the hosts of a single VDC using the option `--dc VDC_UUID`
 
 ## Test your setup
 Is it possible to run the script stand-alone against the IONOS API to verify if the username and password used
 are working as expected in terms of accessing resources
 
 ```
-$ export IONOS_USERNAME="your@username.com" && export IONOS_PASSWORD="your password" ; inventory.py 
+$ export IONOS_USERNAME="your@username.com" && export IONOS_PASSWORD="your password" ; IONOSinventory.py
 
 {
     "workbench": {
@@ -82,4 +86,19 @@ $ export IONOS_USERNAME="your@username.com" && export IONOS_PASSWORD="your passw
         }
     }
 }
+```
+
+To use the IONOSinventory.py with Ansible with no options test it with the following command line:
+```
+$ ansible -i IONOSinventory.py -m ping all
+```
+To use it with the --dc option will be necessaery to create a bash script inventory.sh  like the following:
+```
+#!/bin/bash
+./IONOSinventory.py --dc 4285791a-99a2-484d-804d-6e76bbdc7b84
+```
+
+And then execute it as inventory with Ansible:
+```
+$ ansible -i inventory.sh -m ping all
 ```
