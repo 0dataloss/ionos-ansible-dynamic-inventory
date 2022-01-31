@@ -17,6 +17,7 @@
 
 ######################################################################
 
+from tkinter import N
 import requests
 import json
 import base64
@@ -52,12 +53,29 @@ apiEp="https://api.ionos.com/cloudapi/v6"
 
 # Manage selector but it can be done better than this, I am sure
 if len(sys.argv) == 2:
+  if sys.argv[1] == "--help":
+    print(f"\n{sys.argv[0]} is a Python script designed to work with Ansible as dynamic inventory.\n\nUSAGE:\n"
+    f"  {sys.argv[0]} [flag]\n\n"
+    f"FLAGS:\n"
+    f"  --dc               retrieve a list of UUID and VDC Names\n"
+    f"  --dc <UUID>        list all the servers inside a specivif VDC\n"
+    f"  --off              retrieve a list of server in status SHUTOFF\n"
+    f"  --off --dc <UUID>  returns a list of servers in status SHUTOFF for a specific VDC\n")
+    sys.exit(0)
   if sys.argv[1] == "--list":
     whatToPrint = "LIST"
   elif sys.argv[1] == "--off":
     whatToPrint = "SHUTOFF"
+  elif sys.argv[1] == "--dc":
+    whatToPrint = "DCLIST"
   else:
-    print(f"This option requires an argument")
+    print(f"\n{sys.argv[0]} is a Python script designed to work with Ansible as dynamic inventory.\n\nUSAGE:\n"
+    f"  {sys.argv[0]} [flag]\n\n"
+    f"FLAGS:\n"
+    f"  --dc               retrieve a list of UUID and VDC Names\n"
+    f"  --dc <UUID>        list all the servers inside a specivif VDC\n"
+    f"  --off              retrieve a list of server in status SHUTOFF\n"
+    f"  --off --dc <UUID>  returns a list of servers in status SHUTOFF for a specific VDC\n")
     sys.exit(1)
 elif len(sys.argv) == 3 :
   if sys.argv[1] == "--dc":
@@ -183,9 +201,13 @@ def printlist(authAcc,reqstatus):
   # Create DCs UUID list
   dcs=findDatacenters(authAcc)
   # Iterate inside DCs to find all the hosts 
+  if reqstatus == "DCLIST":
+    for dc in dcs:
+      dcName=findDatacentersName(authAcc,dc)
+      allprint[dc]=dcName
+    return allprint
   for dc in dcs:
       c0=0
-      dcId=dc
       dcName=findDatacentersName(authAcc,dc)
       dcPvlan=findDatacentersPublicVlan(authAcc,dc)
       serversDcList=listServers1DC(authAcc,dc,dcPvlan,reqstatus)
@@ -221,6 +243,9 @@ elif whatToPrint == "SHUTOFF":
   allprint=printlist(authAcc,"SHUTOFF")
   print(allprint)
 # Print Servers RUNNING with public interface for 1 VDC 
+elif whatToPrint == "DCLIST":
+  allprint=printlist(authAcc,"DCLIST")
+  print(allprint)
 elif whatToPrint == "DC" :
   reqstatus="RUNNING"
   dcPvlan=findDatacentersPublicVlan(authAcc,dcUuid)
